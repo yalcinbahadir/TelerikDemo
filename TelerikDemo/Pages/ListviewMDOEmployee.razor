@@ -1,0 +1,80 @@
+﻿@page "/listviewmdoemployee"
+<style>
+    .listview-item {
+        height: auto;
+        width: 250px;
+        display: inline-block;
+        /*       flex-direction:row;
+        flex-wrap:wrap;*/
+        margin: 10px;
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 10px;
+    }
+</style>
+<h3>ListviewMDOEmployee</h3>
+
+<TelerikListView Data="@ListViewCurrPageData" 
+                        TotalCount="@TotalItems" 
+                        Pageable="true"
+                        PageSize="@pageSize"
+                        OnRead="@OnReadHandler" 
+
+                 >
+    <HeaderTemplate>
+        <h2>Employee List</h2>
+    </HeaderTemplate>
+    <Template>
+        <div class="listview-item">
+            <h4 class="card-header">@context.FullName</h4>
+            <div class="card-body">
+                <div class="mb-1">
+                    <img src="@context.ImageUrl" alt="Alternate Text" />
+                </div>
+                <h5>@context.Department.Name</h5>
+                <h5>@context.Salary.ToString("C")</h5>
+                <h5>@context.Email</h5>
+            </div>
+            <div class="card-footer mb-2"> <button class="btn btn-primary">Do sth</button> </div>
+        </div>
+    </Template>
+    <FooterTemplate>
+        A total of <strong>@TotalItems</strong> employee.
+    </FooterTemplate>
+</TelerikListView>
+
+@code{
+    public List<Employee> ListViewCurrPageData { get; set; } = new List<Employee>();
+    int TotalItems { get; set; }
+    int pageSize { get; set; } = 6;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        ListViewCurrPageData = await GetListViewPageData(1, pageSize);
+        TotalItems = await GetTotalItemsCount();
+
+    }
+
+    async Task OnReadHandler(ListViewReadEventArgs e)
+    {
+        ListViewCurrPageData = await GetListViewPageData(e.Request.Page, e.Request.PageSize);
+        TotalItems = await GetTotalItemsCount();
+        StateHasChanged();
+    }
+
+    async Task<List<Employee>> GetListViewPageData(int pageIndex, int pageSize)
+    {
+        // this is just a simulation of a service call, implement as appropriate in your app
+
+        await Task.Delay(500); // simulate real network/database delay. Remove in a real app
+
+        return DataProvider.GetEmployees().Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+    }
+    async Task<int> GetTotalItemsCount()
+    {
+        return DataProvider.GetEmployees().Count;
+    }
+}

@@ -1,0 +1,61 @@
+﻿@page "/listviewmdo"
+<h3>ListviewMDO</h3>
+@* This example simulates fetching the page data from a service *@
+
+<TelerikListView Data="@ListViewCurrPageData" 
+                 OnRead="@OnReadHandler" 
+                 TotalCount="@TotalItems" 
+                 Pageable="true" 
+                 PageSize="@PageSize">
+    <Template>
+        <h6>@context.Name</h6>
+    </Template>
+</TelerikListView>
+
+@code{
+    int TotalItems { get; set; }
+    List<SampleData> ListViewCurrPageData { get; set; }
+    int PageSize { get; set; } = 15;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListViewCurrPageData = await GetListViewPageData(1, PageSize);
+        TotalItems = await GetTotalItemsCount();
+    }
+
+    async Task OnReadHandler(ListViewReadEventArgs e)
+    {
+        ListViewCurrPageData = await GetListViewPageData(e.Request.Page, e.Request.PageSize);
+        TotalItems = await GetTotalItemsCount();
+        StateHasChanged();
+    }
+
+
+
+    async Task<List<SampleData>> GetListViewPageData(int pageIndex, int pageSize)
+    {
+        // this is just a simulation of a service call, implement as appropriate in your app
+
+        await Task.Delay(500); // simulate real network/database delay. Remove in a real app
+
+        return _allData.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+    }
+
+    async Task<int> GetTotalItemsCount()
+    {
+        return _allData.Count;
+    }
+
+    private List<SampleData> _allData { get; set; } = Enumerable.Range(1, 500).Select(x => new SampleData
+    {
+        Id = x,
+        Name = $"Name {x}"
+    }).ToList();
+
+
+    public class SampleData
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+}

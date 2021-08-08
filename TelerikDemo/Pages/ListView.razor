@@ -1,0 +1,141 @@
+﻿@page "/listview"
+<style>
+    .listview-item {
+        height: auto;
+        width: 250px;
+        display: inline-block;
+        /*       flex-direction:row;
+        flex-wrap:wrap;*/
+        margin: 10px;
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 10px;
+    }
+</style>
+<TelerikListView Data="@Employees" Pageable="false">
+    <HeaderTemplate>
+        <h2>Employee List</h2>
+    </HeaderTemplate>
+    <Template>
+        <div class="listview-item">
+            <h4 class="card-header">@context.FullName</h4>
+            <div class="card-body">
+                <h5>@context.DepartmentId</h5>
+                <h5>@context.DateOfBirth</h5>
+                <h5>@context.Email</h5>
+            </div>
+            <div class="card-footer mb-2"> <button class="btn btn-primary">Do sth</button> </div>
+        </div>
+    </Template>
+    <FooterTemplate>
+        A total of <strong>@Employees.Count</strong> employee.
+    </FooterTemplate>
+</TelerikListView>
+
+<hr />
+<div>
+    Pagable listview
+</div>
+<TelerikListView Data="@Employees" Pageable="true" PageSize="4" Page="2">
+    <HeaderTemplate>
+        <h2>Employee List</h2>
+    </HeaderTemplate>
+    <Template>
+        <div class="listview-item">
+            <h4 class="card-header">@context.FullName</h4>
+            <div class="card-body">
+                <div>
+                    <img src="@context.ImageUrl" alt="Alternate Text" />
+                </div>
+                <h5>@context.DepartmentId</h5>
+                <h5>@context.DateOfBirth</h5>
+                <h5>@context.Email</h5>
+            </div>
+            <div class="card-footer mb-2"> <button class="btn btn-primary">Do sth</button> </div>
+        </div>
+    </Template>
+    <FooterTemplate>
+        A total of <strong>@Employees.Count</strong> employee.
+    </FooterTemplate>
+</TelerikListView>
+@code {
+    public List<Employee> Employees { get; set; } = new List<Employee>();
+    bool ExportAllPages { get; set; }
+    protected override Task OnParametersSetAsync()
+    {
+        Employees = DataProvider.GetEmployees();
+        return base.OnParametersSetAsync();
+    }
+
+}
+<hr />
+<div>
+    ListView Pager Settings
+</div>
+
+<TelerikListView Data="@ListViewData"
+                 Pageable="true"
+                 @bind-PageSize="@PageSize"
+                 @bind-Page="@CurrentPage">
+    <ListViewSettings>
+        <ListViewPagerSettings InputType="PagerInputType.Input" PageSizes="@PageSizes" ButtonCount="5" />
+    </ListViewSettings>
+    <Template>
+        <div class="listview-item">
+            <strong>@context.Name</strong>
+        </div>
+    </Template>
+</TelerikListView>
+
+@code{
+    int PageSize { get; set; } = 15;
+    int CurrentPage { get; set; } = 3;
+    protected List<int?> PageSizes { get; set; } = new List<int?> { 15, 30, null };
+
+    List<SampleData> ListViewData { get; set; } = Enumerable.Range(1, 250).Select(x => new SampleData
+    {
+        Id = x,
+        Name = $"Name {x}"
+    }).ToList();
+
+    public class SampleData
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+}
+<hr />
+<div>
+    Pagable listview
+</div>
+<TelerikListView Data="@Employees" Pageable="true" @bind-PageSize="_PageSize" @bind-Page="_CurrentPage">
+    <ListViewSettings>
+        <ListViewPagerSettings InputType="PagerInputType.Input" PageSizes="@_PageSizes" ButtonCount="3" />
+    </ListViewSettings>
+    <HeaderTemplate>
+        <h2>Employee List</h2>
+    </HeaderTemplate>
+    <Template>
+        <div class="listview-item">
+            <h4 class="card-header">@context.FullName</h4>
+            <div class="card-body">
+                <div>
+                    <img src="@context.ImageUrl" alt="Alternate Text" />
+                </div>
+                <h5>@context.DepartmentId</h5>
+                <h5>@context.DateOfBirth</h5>
+                <h5>@context.Email</h5>
+            </div>
+            <div class="card-footer mb-2"> <button class="btn btn-primary">Do sth</button> </div>
+        </div>
+    </Template>
+    <FooterTemplate>
+        A total of <strong>@Employees.Count</strong> employee.
+    </FooterTemplate>
+</TelerikListView>
+
+@code{
+    int _PageSize { get; set; } = 15;
+    int _CurrentPage { get; set; } = 1;
+    protected List<int?> _PageSizes { get; set; } = new List<int?> { 3, 6, 9, null };
+}
